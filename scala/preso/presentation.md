@@ -185,7 +185,7 @@ Chariot Day 2012
 * Most common example you'll see in Scala is a fold over a collection
 
 !SLIDE transition=fade
-# Folding over a collection with currying
+# Folding With Currying
 
     val sum = numbers.foldLeft(0){ case (acc, currentVal) => acc + currentVal }
 
@@ -304,23 +304,27 @@ Chariot Day 2012
 
 !SLIDE transition=fade
 # Category Theory
-.notes Morphism is dim cat to glowing cat, functor would convert a cat to a dog, and a dim cats into dim dogs and glowing cats into glowing dogs, but also dim dogs into glowing dogs just like the cat because the morphism is preserved.
+.notes Morphism is chewy brownie to a hard brownie, functor would convert a brownie to a cookie, and a chewy brownie to a chewy cookie and hard brownie into hard cookie, but also chewy cookies into hard cookies just like the brownie because the morphism is preserved.
 
 * Concepts (types) and Arrows (functions to convert concepts from one to another) 
-* Functors are transformations from one category to another that can also transform/preserve morphisms
 * Morphisms change one value in a category to another in the same category, from one type to another where types are the category
+* Functors are transformations from one category to another that can also transform/preserve morphisms
+
+(From Josh Suereth's Scala in Depth)
 
 !SLIDE transition=fade
 # Monads 
+.notes like a collection with flatMap
 
-* Merely something that can be flattened (like flatMap)
+* Just something that can be flattened 
 * Combine functor applications
 
 !SLIDE transition=fade
 # Option/Either
+.notes No more NPEs
 
 * Option allows you to replace null with None, meaning you can ignore the value in your higher-order functions
-* Either allows you to specify a unified type of either an error condition on the left or a correct value on the right
+* Either is a unified type of either an error condition on the left or a correct value on the right
 
 !SLIDE transition=fade
 # Is Scala too complex?
