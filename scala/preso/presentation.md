@@ -334,6 +334,7 @@ Chariot Day 2012
 !SLIDE transition=fade
 # Credits
 
+* Fast Track to Scala courseware by Typesafe
 * Scala in Depth, by Josh Suereth (MEAP)
 * Wikipedia
 * Runar Bjarnson's NE Scala 2011 talk
