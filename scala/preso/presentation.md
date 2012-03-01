@@ -29,6 +29,7 @@ Chariot Day 2012
 * Functional Programming
 	* Immutability
 	* Referential Transparency
+	* Higher order functions
 * Type Theory
 * Actors
 * Java Interoperability
@@ -179,6 +180,13 @@ Chariot Day 2012
 	val names = List("Jamie", "Al", "Steve")
 	names map { _.toUpperCase } // List(JAMIE, AL, STEVE)
 	names flatMap { _.toUpperCase } // List(J, A, M, I, E, A, L, S, T, E, V, E)
+
+
+!SLIDE transition=fade
+# Function types
+
+* Function literals (lambdas & closures)
+* Function types	
 
 !SLIDE transition=fade
 # Type Theory
