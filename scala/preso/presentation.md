@@ -37,7 +37,6 @@ Chariot Day 2012
 * Java Interoperability
 * Implicits
 * Pattern Matching
-* Type Inference
 * Category Theory
 
 !SLIDE transition=fade
@@ -195,17 +194,12 @@ Chariot Day 2012
 # Currying
 
 def product(i: Int)(j: Int) = i * j // product: (i: Int)(j: Int)Int
-
 val doubler = product(2)_ // doubler: Int => Int = <function1>
-
 doubler(3) // Int = 6
-
 doubler(4) // Int = 8
 
 val tripler = product(3)_ // tripler: Int => Int = <function1>
-
 tripler(4) // Int = 12
-
 tripler(5) // Int = 15
 
 !SLIDE transition=fade
@@ -223,6 +217,7 @@ tripler(5) // Int = 15
 .notes Still a good idea to show types on public interfaces, though
 
 * You don't have to specify a type when declaring a variable/value
+* You don't have to specify return types of methods/functions
 * Local versus Global, as you would have in ML (see Daniel Spiewak's ETE 2011 talk)
 
 !SLIDE transition=fade
