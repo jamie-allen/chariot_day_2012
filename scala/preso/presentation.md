@@ -179,17 +179,34 @@ Chariot Day 2012
 	names flatMap { _.toUpperCase } // List(J, A, M, I, E, A, L, S, T, E, V, E)
 
 !SLIDE transition=fade
+# Folding
+
+    val sum = numbers.foldLeft(0){ case (acc, currentVal) => acc + currentVal }
+
+    sum: Ints = 210
+
+!SLIDE transition=fade
 # Currying
 
 * Currying is the conversion of a function of multiple parameters into a chain of functions that accept a single parameter. A curried function accepts one of its arguments an returns a function that acccepts the next argument. 
 * Most common example you'll see in Scala is a fold over a collection
 
 !SLIDE transition=fade
-# Folding With Currying
+# Currying
 
-    val sum = numbers.foldLeft(0){ case (acc, currentVal) => acc + currentVal }
+def product(i: Int)(j: Int) = i * j // product: (i: Int)(j: Int)Int
 
-    sum: Ints = 210
+val doubler = product(2)_ // doubler: Int => Int = <function1>
+
+doubler(3) // Int = 6
+
+doubler(4) // Int = 8
+
+val tripler = product(3)_ // tripler: Int => Int = <function1>
+
+tripler(4) // Int = 12
+
+tripler(5) // Int = 15
 
 !SLIDE transition=fade
 # Function Types
@@ -286,12 +303,24 @@ Chariot Day 2012
 
     name match {
     	case "Al" => println("Found Al") // Constant
-		case Person("Steve") => println("Found Steve") // Constructor
+		case Person("Louise") => println("Found Louise") // Constructor
+		case "Karen" | "Bob" => println("Found Karen or Bob") // Or (?)
 		case Seq("Al", "Steve") => println("Got Al before Steve") // Sequence
     	case ("Al", "Steve") => println("Got Al and Steve") // Tuple
 		case x: Int if x > 5 => println("got a value greater than 5: " + x) // Type, guard
     	case x => println("Got something that wasn't an Int: " + x) // Variable
     	case _ => println("Not found") // Wildcard
+    }
+
+!SLIDE transition=fade
+# Exception Handling
+.notes Use more specific cases first in the match
+
+    try { 
+        // ... 
+    } catch {
+        case iae: IllegalArgumentException => ... 
+        case e: Exception => ...
     }
 
 !SLIDE transition=fade
@@ -314,7 +343,7 @@ Chariot Day 2012
 
 !SLIDE transition=fade
 # Monads 
-.notes like a collection with flatMap
+.notes like a collection with flatMap. you won't know what they are by looking at code at first. Monads are ephemeral - they have to meet the laws of monads.
 
 * Just something that can be flattened 
 * Combine functor applications
@@ -342,10 +371,14 @@ Chariot Day 2012
 !SLIDE transition=fade
 # Credits
 
-* Fast Track to Scala courseware by Typesafe
-* Scala in Depth, by Josh Suereth (MEAP)
-* Wikipedia
-* Runar Bjarnson's NE Scala 2011 talk
-* Josh Suereth's NE Scala 2011 talk
+* Sources
+	* Fast Track to Scala courseware by Typesafe
+	* Scala in Depth, by Josh Suereth (MEAP)
+	* Wikipedia
+	* Runar Bjarnson's NE Scala 2011 talk
+	* Josh Suereth's NE Scala 2011 talk
+
+Contributors
+	* Dave Esterkin
 
 http://nescala.org/2011/
