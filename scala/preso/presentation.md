@@ -7,13 +7,17 @@ Jamie Allen
 Chariot Day 2012
 
 !SLIDE transition=fade
-
-# How coding in Scala makes me feel
+# How Coding in Scala Makes Me Feel
 
 <img src="snufflin.jpg" class="illustration" note="final slash needed"/>
 
 !SLIDE transition=fade
+# How I Program
 
+* Pre-Scala: Make it work, make it work well, make it work fast
+* With Scala: Make it work AND work well, make it work fast
+
+!SLIDE transition=fade
 # Not a Getting Started Talk
 .notes That's boring as hell.  And you can read it in any one of a number of blog posts.  
 
@@ -21,9 +25,7 @@ Chariot Day 2012
 * Simple examples of cool stuff you can do
 
 !SLIDE transition=fade
-
-# What are the major language features of Scala?
-.notes Everything is an object. FP and TT go hand in hand.
+# Major Language Features of Scala
 
 * Object Oriented
 * Functional Programming
@@ -39,47 +41,50 @@ Chariot Day 2012
 * Category Theory
 
 !SLIDE transition=fade
-
 # Object Oriented Features
-.notes Laziness is good for reducing initial instantiation time, reducing initial footprint, resolve ordering issues. But there is a cost in a guard field and synchronization, ensuring it is created when necessary. By-name parameters are evaluated every time they are referenced within the method they are passed to.
+.notes Everything is an object.
 
-* Default parameter values
+!SLIDE transition=fade
+# Default Parameter Values
+
     class Address(val State = "PA")
-* Named parameters
+
+!SLIDE transition=fade
+# Named Parameters
+
     new Person(lastName = "Allen")
-* By-name parameters
+
+!SLIDE transition=fade
+# By-Name Parameters
+.notes By-name parameters are evaluated every time they are referenced within the method they are passed to.
+
 	def doSomething(t: => Long) = {
 		println(t)
 		println(t)
 	}
-* Lazy definition
+
+!SLIDE transition=fade
+# Lazy Definition
+.notes Laziness is good for reducing initial instantiation time, reducing initial footprint, resolve ordering issues. But there is a cost in a guard field and synchronization, ensuring it is created when necessary.
+
 	lazy val calculatedValue = (some big, expensive calcuation)
 
 !SLIDE transition=fade
-
 # Imports
+.notes Can be anywhere in a class, embedded in code, allow for selecting multiple classes from a package, aliasing
 
-* Can be anywhere in a class
-* Allow for selecting multiple classes from a package
-* Aliasing, to rename an imported type and avoid confusion
 	import scala.collection.mutable.{Map => MMap}
 	import scala.collection.immutable.Map
 
 !SLIDE transition=fade
-
 # Objects
 
 * Singletons within a JVM, no private constructor histrionics
 * Companion Objects, used for factories and constants
 
 !SLIDE transition=fade
-
 # Case Classes
-
-* DTOs done right
-* All class parameters are immutable
-* Cannot be extended
-* equals() and hashCode() with no annoyance
+.notes DTOs done right, all class parameters are immutable, cannot be extended, equals() and hashCode() with no annoyance
 
 	case class Person(firstName: String, lastName: String)
 
@@ -103,7 +108,7 @@ Chariot Day 2012
 * Extends beyond marking instances final, you must not leak mutability
 
 !SLIDE transition=fade
-# How inadvertent mutation makes me feel
+# How Inadvertent Mutation Makes Me Feel
 
 <img src="wtf_husky.jpg" class="illustration" note="final slash needed"/>
 
@@ -112,7 +117,6 @@ Chariot Day 2012
 
 * An expression is transparent if it can be replaced by its VALUE without changing the behavior of the program
 * In math, all functions are referentially transparent
-
 
 !SLIDE transition=fade
 # Referentially Transparent
@@ -133,14 +137,7 @@ Chariot Day 2012
 	jamiejamie
 
 !SLIDE transition=fade
-# How I program
-
-* Pre-Scala: Make it work, make it work well, make it work fast
-* With Scala: Make it work AND work well, make it work fast
-
-!SLIDE transition=fade
-
-# First, Collections Classes
+# Collections
 
 * Immutable and Mutable
 * Rich implementations, extremely flexible
@@ -151,7 +148,7 @@ Chariot Day 2012
 	* Vector
 
 !SLIDE transition=fade
-# Rich higher order function support
+# Higher Order Functions
 .notes Applying lambdas to collections.  Function literals, function values.  Convert methods into functions. head/tail on linear sequences and lists.
 
 	val numbers = 1 to 20 // Range(1, 2, 3, ... 20)
@@ -181,11 +178,24 @@ Chariot Day 2012
 	names map { _.toUpperCase } // List(JAMIE, AL, STEVE)
 	names flatMap { _.toUpperCase } // List(J, A, M, I, E, A, L, S, T, E, V, E)
 
+!SLIDE transition=fade
+# Currying
+
+* Currying is the conversion of a function of multiple parameters into a chain of functions that accept a single parameter. A curried function accepts one of its arguments an returns a function that acccepts the next argument. 
+* Most common example you'll see in Scala is a fold over a collection
 
 !SLIDE transition=fade
-# Function types
+# Folding over a collection with currying
 
-* Function literals (lambdas & closures)
+    val sum = numbers.foldLeft(0){ case (acc, currentVal) => acc + currentVal }
+
+    sum: Ints = 210
+
+!SLIDE transition=fade
+# Function Types
+.notes lambdas & closures defined without binding to a definition
+
+* Function literals
 * Function types	
 
 !SLIDE transition=fade
@@ -195,18 +205,21 @@ Chariot Day 2012
 # Type Inference
 .notes Still a good idea to show types on public interfaces, though
 
-* Local versus Global, as you would have in ML (see Daniel Spiewak's ETE 2011 talk)
 * You don't have to specify a type when declaring a variable/value
+* Local versus Global, as you would have in ML (see Daniel Spiewak's ETE 2011 talk)
 
 !SLIDE transition=fade
-# Cool type tricks
+# Cool Type Tricks
 .notes path dependent is specifying an instance on which that type must exist. Projections are across all instances of that type
 
-* Path dependent types 
+	// Path dependent types 
     foo.Bar
-* Type projections
-    Foo#Bar
-* Structural types
+
+	// Type projections
+    Foo#Bar 
+
+    // Structural types
+	def loadProperties(c:{ def getProperties():Properties })
 
 !SLIDE transition=fade
 # Type Constraints
@@ -224,7 +237,7 @@ Chariot Day 2012
 * Also called type constructors 
 
 !SLIDE transition=fade
-# Type lambdas 
+# Type Lambdas 
 .notes I want to establish a pattern here, wait until we get to functional programming
 
 * Just like function lambdas
@@ -234,7 +247,7 @@ Chariot Day 2012
 # Actors
 
 * Erlang/OTP
-* Akka will replace language actors in Scala v2.10
+* Akka will replace language actors
 * Concurrency paradigm using networks of independent objects that can (should) only communicate via messaging
 * Example later
 
@@ -252,7 +265,7 @@ Chariot Day 2012
 * Exist in other languages, like C
 
 !SLIDE transition=fade
-# Implicits are Voodoo!
+# Implicits Are Voodoo!
 
 * Do not use them until you understand them
 * Limit scope as much as possible (see Josh Suereth's NE Scala 2011 talk)
@@ -268,7 +281,7 @@ Chariot Day 2012
 * Falls through to first complete match
 
 !SLIDE transition=fade
-# Many different ways to do it
+# Pattern Matching
 .notes Note that variable and wildcard are in conflict here
 
     name match {
@@ -308,15 +321,6 @@ Chariot Day 2012
 
 * Option allows you to replace null with None, meaning you can ignore the value in your higher-order functions
 * Either allows you to specify a unified type of either an error condition on the left or a correct value on the right
-
-!SLIDE transition=fade
-# Currying
-
-* Currying is the conversion of a function of multiple parameters into a chain of functions that accept a single parameter. A curried function accepts one of its arguments an returns a function that acccepts the next argument. 
-* Most common example you'll see in Scala is a fold over a collection
-    val sum = numbers.foldLeft(0){ case (acc, currentVal) => acc + currentVal }
-
-    sum: Ints = 210
 
 !SLIDE transition=fade
 # Is Scala too complex?
