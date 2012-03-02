@@ -9,7 +9,7 @@ Chariot Day 2012
 !SLIDE transition=fade
 # How Coding in Scala Makes Me Feel
 
-<img src="./snufflin.jpg" class="illustration" note="final slash needed"/>
+<img src="snufflin.jpg" class="illustration" note="final slash needed"/>
 
 !SLIDE transition=fade
 # How I Program
