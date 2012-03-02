@@ -365,7 +365,7 @@ Chariot Day 2012
 	  		})
 
 !SLIDE transition=fade
-# Flatmapping across data collections example
+# Flatmapping Across Data Collections Example
 
 	  val macsByAccountNumber = getMapFromFile("Accounts-MAC.csv"), 0, 3)
 	  val rateCodesByMac = getMapFromFile("MAC-RCs.csv", 0, 1)
