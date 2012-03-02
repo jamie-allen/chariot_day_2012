@@ -1,6 +1,6 @@
 !SLIDE title-page
 
-## Scala - How to Make Java Annoy You
+## Scala - The Kitchen Sink View
 
 Jamie Allen
 
@@ -28,15 +28,12 @@ Chariot Day 2012
 # Major Language Features of Scala
 
 * Object Oriented
+* Pattern Matching
 * Functional Programming
-	* Immutability
-	* Referential Transparency
-	* Higher order functions
 * Type Theory
 * Actors
 * Java Interoperability
 * Implicits
-* Pattern Matching
 * Category Theory
 
 !SLIDE transition=fade
@@ -51,7 +48,7 @@ Chariot Day 2012
 !SLIDE transition=fade
 # Named Parameters
 
-    new Person(lastName = "Allen")
+    new Person(lastName = "Doe")
 
 !SLIDE transition=fade
 # By-Name Parameters
@@ -86,6 +83,50 @@ Chariot Day 2012
 .notes DTOs done right, all class parameters are immutable, cannot be extended, equals() and hashCode() with no annoyance
 
 	case class Person(firstName: String, lastName: String)
+
+!SLIDE transition=fade
+# Algebraic Data Types
+.notes According to Tony Morris, it's using a type to define an Algebra.  Scala doesn't support them directly as Haskell does, but you can use case classes to represent the concept. True/False are data type constructors in this example, and it's "closed". Scala uses sealed traits to do this. This is a sum ADT, others include product, recursive, etc.
+
+	data Boolean = True | False // Haskell
+
+	sealed trait Boolean
+	case object True extends Boolean
+	case object False extends Boolean
+
+!SLIDE transition=fade
+# Pattern Matching
+
+* One of my favorite Scala constructs
+* Case statements on steroids
+* Falls through to first complete match
+
+!SLIDE transition=fade
+# Pattern Matching
+.notes Note that variable and wildcard are in conflict here. Use more specific cases first
+
+    name match {
+    	case "Lisa" => println("Found Lisa") // Constant
+		case Person("Bob") => println("Found Bob") // Constructor
+		case "Karen" | "Michelle" => println("Found Karen or Michelle") // Or (?)
+		case Seq("Dave", "John") => println("Got Dave before John") // Sequence
+		case Seq("Dave", "John", _*) => println("Got Dave before John") // Sequence
+    	case ("Susan", "Steve") => println("Got Susan and Steve") // Tuple
+		case x: Int if x > 5 => println("got a value greater than 5: " + x) // Type, guard
+    	case x => println("Got something that wasn't an Int: " + x) // Variable
+    	case _ => println("Not found") // Wildcard
+    }
+
+!SLIDE transition=fade
+# Exception Handling
+.notes Again, use more specific cases first in the match
+
+    try { 
+        // ... 
+    } catch {
+        case iae: IllegalArgumentException => ... 
+        case e: Exception => ...
+    }
 
 !SLIDE transition=fade
 # Tuples
@@ -173,12 +214,12 @@ Chariot Day 2012
 !SLIDE transition=fade
 # flatMap
 	
-	val names = List("Jamie", "Al", "Steve")
-	names map { _.toUpperCase } // List(JAMIE, AL, STEVE)
-	names flatMap { _.toUpperCase } // List(J, A, M, I, E, A, L, S, T, E, V, E)
+	val names = List("Barb", "Phil", "Pat")
+	names map { _.toUpperCase } // List(BARB, PHIL, PAT)
+	names flatMap { _.toUpperCase } // List(B, A, R, B, P, H, I, L, P, A, T)
 
 !SLIDE transition=fade
-# Folding
+# fold
 
     val sum = numbers.foldLeft(0){ case (acc, currentVal) => acc + currentVal }
 
@@ -188,10 +229,10 @@ Chariot Day 2012
 # Currying
 
 * Currying is the conversion of a function of multiple parameters into a chain of functions that accept a single parameter. A curried function accepts one of its arguments an returns a function that acccepts the next argument. 
-* Most common example you'll see in Scala is a fold over a collection
 
 !SLIDE transition=fade
 # Currying
+.notes Take a function that takes 2 parameters (Product), and curry it to create a new function that only takes one parameter (Doubler).  We "fix" a value and use it to apply a specific implementation of a product with semantic value.  Functions are automatically curry-able in ML and Haskell, but have to be defined explicitly as such in Scala.  Note the _ is what explicitly marks this as curried.
 
 def product(i: Int)(j: Int) = i * j // product: (i: Int)(j: Int)Int
 val doubler = product(2)_ // doubler: Int => Int = <function1>
@@ -286,39 +327,6 @@ tripler(5) // Int = 15
 <img src="double_facepalm.jpg" class="illustration" note="final slash needed"/>
 
 !SLIDE transition=fade
-# Pattern Matching
-
-* One of my favorite Scala constructs
-* Case statements on steroids
-* Falls through to first complete match
-
-!SLIDE transition=fade
-# Pattern Matching
-.notes Note that variable and wildcard are in conflict here
-
-    name match {
-    	case "Al" => println("Found Al") // Constant
-		case Person("Louise") => println("Found Louise") // Constructor
-		case "Karen" | "Bob" => println("Found Karen or Bob") // Or (?)
-		case Seq("Al", "Steve") => println("Got Al before Steve") // Sequence
-    	case ("Al", "Steve") => println("Got Al and Steve") // Tuple
-		case x: Int if x > 5 => println("got a value greater than 5: " + x) // Type, guard
-    	case x => println("Got something that wasn't an Int: " + x) // Variable
-    	case _ => println("Not found") // Wildcard
-    }
-
-!SLIDE transition=fade
-# Exception Handling
-.notes Use more specific cases first in the match
-
-    try { 
-        // ... 
-    } catch {
-        case iae: IllegalArgumentException => ... 
-        case e: Exception => ...
-    }
-
-!SLIDE transition=fade
 # Category Theory
 
 * Makes many of us feel like idiots because we don't know what the eggheads are talking about
@@ -359,6 +367,30 @@ tripler(5) // Int = 15
 
 !SLIDE transition=fade
 # Flatmapping across data collections example
+	import scala.collection.mutable.{MultiMap, HashMap => MHash, Set => MSet}
+	def getMapFromFile(fileName: String, key: Int, value: Int) = {
+	  Source.fromFile(fileName).getLines.drop(1)
+	  	.foldLeft(new MHash[String, MSet[String]]() with MultiMap[String, String])
+	  		((a, b) => {
+	    		val lineTokens = b.split(",")
+	    		a.addBinding(lineTokens(key), lineTokens(value))
+	  		})
+
+	def loadDataAndJoin() {
+	  val macsByAccountNumber = getMapFromFile("Accounts-MAC.csv"), 0, 3)
+	  val rateCodesByMac = getMapFromFile("MAC-RCs.csv", 0, 1)
+	  val bsgHandlesByRateCode = getMapFromFile("RC-BSG.csv", 5, 6)
+	  val sourceIdByBsgHandle = getMapFromFile("BSG-SourceId.csv", 2, 4)
+
+	  val sourceIdsByAcctAndMac = new MHash[(String, String), MSet[String]]() with MultiMap[(String, String), String]
+	  for {
+	    acc <- macsByAccountNumber.keys
+	  	mac <- macsByAccountNumber.getOrElse(acc, MSet().empty)
+	  	rc <- rateCodesByMac.get(mac).flatten
+	  	bsg <- bsgHandlesByRateCode.get(rc).flatten
+	  	src <- sourceIdByBsgHandle.get(bsg).flatten
+      } yield sourceIdsByAcctAndMac.addBinding((acc, mac), src)
+	}
 
 !SLIDE transition=fade
 # Producer/Consumer Actors example
