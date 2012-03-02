@@ -217,11 +217,6 @@ Chariot Day 2012
 
 !SLIDE transition=fade
 # Currying
-
-* Currying is the conversion of a function of multiple parameters into a chain of functions that accept a single parameter. A curried function accepts one of its arguments an returns a function that acccepts the next argument. 
-
-!SLIDE transition=fade
-# Currying
 .notes Take a function that takes 2 parameters (Product), and curry it to create a new function that only takes one parameter (Doubler).  We "fix" a value and use it to apply a specific implementation of a product with semantic value.  Functions are automatically curry-able in ML and Haskell, but have to be defined explicitly as such in Scala.  Note the _ is what explicitly marks this as curried.
 
 	def product(i: Int)(j: Int) = i * j // product: (i: Int)(j: Int)Int
