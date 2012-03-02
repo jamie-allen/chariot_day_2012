@@ -352,6 +352,7 @@ Chariot Day 2012
 
 !SLIDE transition=fade
 # Flatmapping across data collections example
+.notes This implementation with a fold is not really idiomatic scala - you might use a foreach instead, since you don't return anything until completion.
 
 	def loadDataAndJoin() {
 	  import scala.collection.mutable.{MultiMap, HashMap => MMap, Set => MSet}
