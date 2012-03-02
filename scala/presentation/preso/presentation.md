@@ -28,7 +28,7 @@ Chariot Day 2012
 # Major Language Features of Scala
 
 * Object Oriented
-* Pattern Matching
+* Case Classes and Pattern Matching
 * Functional Programming
 * Type Theory
 * Actors
