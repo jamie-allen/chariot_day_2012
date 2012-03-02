@@ -351,7 +351,7 @@ Chariot Day 2012
 * Should a language be responsible for providing convention as well as capability?
 
 !SLIDE transition=fade
-# Flatmapping across data collections example
+# Loading Data to Be Processed
 .notes This implementation with a fold is not really idiomatic scala - you might use a foreach instead, since you don't return anything until completion.
 
 	def loadDataAndJoin() {
