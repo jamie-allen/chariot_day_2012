@@ -1,6 +1,6 @@
 !SLIDE title-page
 
-## Scala - The Kitchen Sink View
+## Scala - The Kitchen Sink in 45 Minutes
 
 Jamie Allen
 
@@ -83,16 +83,6 @@ Chariot Day 2012
 .notes DTOs done right, all class parameters are immutable, cannot be extended, equals() and hashCode() with no annoyance
 
 	case class Person(firstName: String, lastName: String)
-
-!SLIDE transition=fade
-# Algebraic Data Types
-.notes According to Tony Morris, it's using a type to define an Algebra.  Scala doesn't support them directly as Haskell does, but you can use case classes to represent the concept. True/False are data type constructors in this example, and it's "closed". Scala uses sealed traits to do this. This is a sum ADT, others include product, recursive, etc.
-
-	data Boolean = True | False // Haskell
-
-	sealed trait Boolean
-	case object True extends Boolean
-	case object False extends Boolean
 
 !SLIDE transition=fade
 # Pattern Matching
