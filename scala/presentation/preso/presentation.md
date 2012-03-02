@@ -352,17 +352,19 @@ Chariot Day 2012
 
 !SLIDE transition=fade
 # Loading Data to Be Processed
-.notes This implementation with a fold is not really idiomatic scala - you might use a foreach instead, since you don't return anything until completion.
+.notes 
 
-	def loadDataAndJoin() {
+	object DataProcessor {
 	  import scala.collection.mutable.{MultiMap, HashMap => MMap, Set => MSet}
-	  def getMapFromFile(fileName: String, key: Int, value: Int) = {
-	    Source.fromFile(fileName).getLines.drop(1)
-	  	  .foldLeft(new MMap[String, MSet[String]]() with MultiMap[String, String])
-	  		((a, b) => {
-	    		val lineTokens = b.split(",")
-	    		a.addBinding(lineTokens(key), lineTokens(value))
-	  		})
+	  import scala.io.Source
+	  def getMapFromFile(fileName: String, keyIndex: Int, valueIndex: Int): MMap[String, MSet[String]] = {
+	    val result = new MMap[String, MSet[String]]() with MultiMap[String, String]
+	    for {line <- Source.fromFile(fileName).getLines.drop(1)
+	        val lineTokens = line.split(",")}
+	      result.addBinding(lineTokens(keyIndex), lineTokens(valueIndex))
+	    result
+	  }
+	}
 
 !SLIDE transition=fade
 # Flatmapping Across Data Collections Example
