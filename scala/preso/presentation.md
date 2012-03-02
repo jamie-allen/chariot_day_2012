@@ -378,6 +378,9 @@ tripler(5) // Int = 15
 	    		a.addBinding(lineTokens(key), lineTokens(value))
 	  		})
 
+!SLIDE transition=fade
+# Flatmapping across data collections example
+
 	  val macsByAccountNumber = getMapFromFile("Accounts-MAC.csv"), 0, 3)
 	  val rateCodesByMac = getMapFromFile("MAC-RCs.csv", 0, 1)
 	  val bsgHandlesByRateCode = getMapFromFile("RC-BSG.csv", 5, 6)
