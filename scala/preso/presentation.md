@@ -367,22 +367,23 @@ tripler(5) // Int = 15
 
 !SLIDE transition=fade
 # Flatmapping across data collections example
-	import scala.collection.mutable.{MultiMap, HashMap => MHash, Set => MSet}
-	def getMapFromFile(fileName: String, key: Int, value: Int) = {
-	  Source.fromFile(fileName).getLines.drop(1)
-	  	.foldLeft(new MHash[String, MSet[String]]() with MultiMap[String, String])
+
+	def loadDataAndJoin() {
+	  import scala.collection.mutable.{MultiMap, HashMap => MMap, Set => MSet}
+	  def getMapFromFile(fileName: String, key: Int, value: Int) = {
+	    Source.fromFile(fileName).getLines.drop(1)
+	  	  .foldLeft(new MMap[String, MSet[String]]() with MultiMap[String, String])
 	  		((a, b) => {
 	    		val lineTokens = b.split(",")
 	    		a.addBinding(lineTokens(key), lineTokens(value))
 	  		})
 
-	def loadDataAndJoin() {
 	  val macsByAccountNumber = getMapFromFile("Accounts-MAC.csv"), 0, 3)
 	  val rateCodesByMac = getMapFromFile("MAC-RCs.csv", 0, 1)
 	  val bsgHandlesByRateCode = getMapFromFile("RC-BSG.csv", 5, 6)
 	  val sourceIdByBsgHandle = getMapFromFile("BSG-SourceId.csv", 2, 4)
 
-	  val sourceIdsByAcctAndMac = new MHash[(String, String), MSet[String]]() with MultiMap[(String, String), String]
+	  val sourceIdsByAcctAndMac = new MMap[(String, String), MSet[String]]() with MultiMap[(String, String), String]
 	  for {
 	    acc <- macsByAccountNumber.keys
 	  	mac <- macsByAccountNumber.getOrElse(acc, MSet().empty)
