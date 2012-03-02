@@ -300,7 +300,7 @@ Chariot Day 2012
 # Implicits
 
 * At compilation time, looks for definitions that will fix type incompatibility
-* Exist in other languages, like C
+* Exist in other languages, like C type coercion
 
 !SLIDE transition=fade
 # Implicits Are Voodoo!
