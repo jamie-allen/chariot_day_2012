@@ -234,14 +234,14 @@ Chariot Day 2012
 # Currying
 .notes Take a function that takes 2 parameters (Product), and curry it to create a new function that only takes one parameter (Doubler).  We "fix" a value and use it to apply a specific implementation of a product with semantic value.  Functions are automatically curry-able in ML and Haskell, but have to be defined explicitly as such in Scala.  Note the _ is what explicitly marks this as curried.
 
-def product(i: Int)(j: Int) = i * j // product: (i: Int)(j: Int)Int
-val doubler = product(2)_ // doubler: Int => Int = <function1>
-doubler(3) // Int = 6
-doubler(4) // Int = 8
+	def product(i: Int)(j: Int) = i * j // product: (i: Int)(j: Int)Int
+	val doubler = product(2)_ // doubler: Int => Int = <function1>
+	doubler(3) // Int = 6
+	doubler(4) // Int = 8
 
-val tripler = product(3)_ // tripler: Int => Int = <function1>
-tripler(4) // Int = 12
-tripler(5) // Int = 15
+	val tripler = product(3)_ // tripler: Int => Int = <function1>
+	tripler(4) // Int = 12
+	tripler(5) // Int = 15
 
 !SLIDE transition=fade
 # Function Types
@@ -409,7 +409,7 @@ tripler(5) // Int = 15
 	* Runar Bjarnson's NE Scala 2011 talk
 	* Josh Suereth's NE Scala 2011 talk
 
-Contributors
+* Contributors
 	* Dave Esterkin
 
 http://nescala.org/2011/
