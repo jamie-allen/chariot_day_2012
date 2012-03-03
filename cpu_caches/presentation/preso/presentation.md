@@ -105,7 +105,7 @@ Image by Alexander Taubenkorb, Wikimedia Commons
 
 * Shared between cores
 * Varies in size with different processors
-* Uses Quick Path links (QPI) for cache coherency and snooping
+* Uses Quick Path Interconnect links (QPI) for cache coherency and snooping
 
 !SLIDE transition=fade
 # Exclusive versus Inclusive
