@@ -85,6 +85,13 @@ Chariot Day 2012
 	case class Person(firstName: String, lastName: String)
 
 !SLIDE transition=fade
+# Tuples
+.notes Binds you to an implementation, very fragile.  But useful.  Great way to group values without a DTO.  How to return multiple values, but wrapped in a single object instance.
+
+	case class Person(name: String)
+	val (num: Int, person: Person) = (1, Person("Phil"))
+
+!SLIDE transition=fade
 # Pattern Matching
 
 * One of my favorite Scala constructs
@@ -117,13 +124,6 @@ Chariot Day 2012
         case iae: IllegalArgumentException => ... 
         case e: Exception => ...
     }
-
-!SLIDE transition=fade
-# Tuples
-.notes Binds you to an implementation, very fragile.  But useful.
-
-* Great way to group values without a DTO
-* How to return multiple values, but wrapped in a single object instance
 
 !SLIDE transition=fade
 # Functional Programming
@@ -187,7 +187,7 @@ Chariot Day 2012
 	numbers.filter(_ < 5) // Vector(1, 2, 3, 4)
 	numbers.head // Int = 1
 	numbers.tail // Range(2, 3, 4, ... 20)
-	numbers.take(5) // Range(1, 2, 3, 4)
+	numbers.take(5) // Range(1, 2, 3, 4, 5)
 	numbers.drop(5) // Range(6, 7, 8, ... 20)
 
 !SLIDE transition=fade
