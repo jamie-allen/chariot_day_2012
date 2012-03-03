@@ -8,7 +8,7 @@ Chariot Day 2012
 
 !SLIDE transition=fade
 # Data Locality
-.notes All algorithms are dominated by that - you have to send data somewhere to have an operation performed on it, and then you have to send it back to where it can be used.  The key thing with spatial is that data that is required together is located together.  This is especially important for what fields are required in a structure.  C preserves structure order but Java does not.  The best designs for Java/Scala are to make sure your object design is very cohesive so fields are in the appropriate objects.  With one client I got a 20% performance boost just by focusing on good cohesive design and measuring after.  Adjacent line cache fetching can help with this but also has an impact of false sharing.
+.notes All algorithms are dominated by that - you have to send data somewhere to have an operation performed on it, and then you have to send it back to where it can be used. (Martin: The key thing with spatial is that data that is required together is located together.  This is especially important for what fields are required in a structure.  C preserves structure order but Java does not.  The best designs for Java/Scala are to make sure your object design is very cohesive so fields are in the appropriate objects.  With one client I got a 20% performance boost just by focusing on good cohesive design and measuring after.  Adjacent line cache fetching can help with this but also has an impact of false sharing.)
 
 * Spatial - reused over and over in a loop, data accessed in small regions
 * Temporal - high probability it will be reused before long
