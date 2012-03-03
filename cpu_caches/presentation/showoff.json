@@ -1,0 +1,6 @@
+{
+    "name"        : "CPU Caches",
+    "description" : "Detailed description of hardware caching on CPUs",
+    "sections"    : [ {"section" : "preso" } ]
+}
+
