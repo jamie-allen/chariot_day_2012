@@ -8,14 +8,14 @@ Chariot Day 2012
 
 !SLIDE transition=fade
 # Data Locality
-.notes All algorithms are dominated by that - you have to send data somewhere to have an operation performed on it, and then you have to send it back to where it can be used.
+.notes All algorithms are dominated by that - you have to send data somewhere to have an operation performed on it, and then you have to send it back to where it can be used.  The key thing with spatial is that data that is required together is located together.  This is especially important for what fields are required in a structure.  C preserves structure order but Java does not.  The best designs for Java/Scala are to make sure your object design is very cohesive so fields are in the appropriate objects.  With one client I got a 20% performance boost just by focusing on good cohesive design and measuring after.  Adjacent line cache fetching can help with this but also has an impact of false sharing.
 
 * Spatial - reused over and over in a loop, data accessed in small regions
 * Temporal - high probability it will be reused before long
 
 !SLIDE transition=fade
 # Architecture
-.notes Many machines today are SMP, a multiprocessor architecture where two or more identical processors are connected to a single shared main memory and controlled by a single OS instance.  Every socket has its own infrastructure that communicates with RAM via the frontside bus and northbridge.  2011 Sandy Bridge and AMD Fusion integrated Northbridge functions into CPUs, along with processor cores, memory controller and graphics processing unit. So components are closer together today than depicted in this picture.
+.notes Many machines today are SMP, a multiprocessor architecture where two or more identical processors are connected to a single shared main memory and controlled by a single OS instance.  Used to be that every socket had its own infrastructure that communicates with RAM via the frontside bus and northbridge.  (Martin: Ever since Intel's Nehalem CPU sockets have their own memory.  Another socket does not have access to the "global" RAM, it must go via the socket that owns the memory over the socket interconnect (QPI, HT, etc.).)  2011 Sandy Bridge and AMD Fusion integrated Northbridge functions into CPUs, along with processor cores, memory controller and graphics processing unit. So components are closer together today than depicted in this picture.
 
 <img src="300px-Schema_chipsatz.png" class="illustration" note="final slash needed"/>
 
@@ -23,7 +23,7 @@ Image by Alexander Taubenkorb, Wikimedia Commons
 
 !SLIDE transition=fade
 # Memory Wall
-.notes Gil Tene, CTO of Azul has a good presentation about this concept from a paper in 1994 on their website.  Each Intel core has 6 execution units able to perform work during a cycle (loading memory, storing memory, arithmetic, branch logic, shifting, etc), but they need to be fed data very fast to take advantage of it. Note that it didn't happen because of RAM, but the Application Memory Wall does exist in other forms, like GC pauses.
+.notes Gil Tene, CTO of Azul has a good presentation about this concept from a paper in 1994 on their website.  Each Intel core has 6 execution units able to perform work during a cycle (loading memory, storing memory, arithmetic, branch logic, shifting, etc), but they need to be fed data very fast to take advantage of it. Note that it didn't happen because of RAM, but the Application Memory Wall does exist in other forms, like GC pauses.  (Martin: with an application designed for low GC, you can hit the memory wall; but for middle of the road applications, Gil's point holds true.)
 
 * CPUs are getting faster
 * Memory isn't, and bandwidth is increasing at a much slower rate
@@ -40,8 +40,7 @@ Image by Alexander Taubenkorb, Wikimedia Commons
 
 !SLIDE transition=fade
 # Non-Uniform Memory Access (NUMA)
-.notes NUMA architectures have more trouble migrating processes across cores.  Initially, it has to look for a core with the same speed accessing memory resources and enough resources for the process.  If none are found, it then allows for degradation.
-NUMA is not the same as multiple commodity machines because they don't have a shared address space.
+.notes NUMA architectures have more trouble migrating processes across cores.  Initially, it has to look for a core with the same speed accessing memory resources and enough resources for the process.  If none are found, it then allows for degradation.  NUMA is not the same as multiple commodity machines because they don't have a shared address space.  (Martin: On NUMA I'm finding that a typical application that is not NUMA aware can be made 20-40% faster just by setting socket affinity.  Most folk are totally unaware of this issue.  Thread migration on a NUMA box is mega costly because you don't even have an L3 cache warmed after the socket migration.)
 
 * Access time is dependent on the memory locality to a processor
 * Memory local to a processor can be accessed faster than memory farther away
@@ -52,7 +51,7 @@ NUMA is not the same as multiple commodity machines because they don't have a sh
 .notes sometimes called the fetch and execute cycle, or fetch-decode-execute cycle, or FDX.  Process by which a computer retrieves a program instruction from memory, determines what actions the instructions require, and carries out those actions.
 
 * Basic operation cycle of a computer
-* Sandy Bridge has 2 load/store operations per for each memory channel
+* Sandy Bridge has 2 load/store operations for each memory channel
 
 !SLIDE transition=fade
 # Registers
@@ -77,6 +76,12 @@ NUMA is not the same as multiple commodity machines because they don't have a sh
 * Runs at a cycle rate, not quite measurable in time
 * Data does not fade or leak, does not need to be refreshed/recharged
 
+# L0
+.notes (Martin: Sandybridge also has a L0 instruction cache which is great for hot loops.  This is an "in core" cache of the last ~1.5K decoded uops (equivalent to 6K macro ops).  Macro ops have to be decoded into micro ops before being processed.  Nehalem would use the L1 cache for macro ops decoding all the time.  Sandybridge caches the uops for a nice perf boost in tight code.)
+
+* Intel's Sandy Bridge architecture
+* uops are Micro-Ops
+
 !SLIDE transition=fade
 # L1
 .notes Instructions are generated by the compiler, which knows rules for good code generation.  Code has predictable patterns, & CPUs are good at recognizing them, helping pre-fetching.  And spatial and temporal locality is good.
@@ -96,7 +101,7 @@ NUMA is not the same as multiple commodity machines because they don't have a sh
 
 !SLIDE transition=fade
 # L3
-.notes where concurrency takes place, data is passed between cores on a socket.  Sandy Bridge is 4-8MB, includes the processor graphics.  Processors "snoop" on each other, and certain actions are announced on external pins to make changes visible to others.  The address of the cache line is visible through the address bus
+.notes where concurrency takes place, data is passed between cores on a socket.  Sandy Bridge is 4-30MB (8MB is currently max for mobile platforms), includes the processor graphics.  Processors "snoop" on each other, and certain actions are announced on external pins to make changes visible to others.  The address of the cache line is visible through the address bus
 
 * Shared between cores
 * Varies in size with different processors
@@ -104,30 +109,30 @@ NUMA is not the same as multiple commodity machines because they don't have a sh
 
 !SLIDE transition=fade
 # Exclusive versus Inclusive
-.notes In an exclusive cache (AMD), when the processor needs data it is loaded by cache line into L1d, which evicts a line to L2, which evicts a line to L3, which evicts a line to main memory; each eviction is progressively more expensive
-In an inclusive cache (Intel), eviction is much faster, but requires a larger L2
+.notes In an exclusive cache (AMD), when the processor needs data it is loaded by cache line into L1d, which evicts a line to L2, which evicts a line to L3, which evicts a line to main memory; each eviction is progressively more expensive.  In an inclusive cache (Intel), eviction is much faster, but requires a larger L2.  (Martin: The inclusive/exclusive of cache only applies to L1 and L2.  L3 is independent and pretty much always inclusive.)
 
 * AMD is exclusive
 * Intel is inclusive
 
 !SLIDE transition=fade
-# MESI Cache Coherency Protocol
+# MESI+F Cache Coherency Protocol
 .notes Request for Ownership (RFO): a cache line is held exclusively for read by one processor, but another requests for write.  Cache line is sent, but not marked shared by the original holder.  Instead, it is marked Invalid and the other cache becomes Exclusive.  This marking happens in the memory controller.  Performing this operation in the last level cache is expensive, as is the I->M transition.  If a Shared cache line is modified, all other views of it must be marked invalid via an announcement RFO message.  If Exclusive, no need to announce.  Processors will try to keep cache lines in an exclusive state, as the E to M transition is much faster than S to M.  RFOs occur when a thread is migrated to another processor and the cache lines have to be moved once, or when two threads absolutely must share a line; the costs ar a bit smaller when shared across two cores on the same processor.  MESI transitions cannot occur until all processors acknowledge a coherency message.  Collisions on the bus can happen, latenc can be high with NUMA systems, sheer traffic can slow things down - all reasons to minimize traffic.  Since code almost never changes, instruction caches do not use MESI but rather just a SI protocol.  If code does change, a lot of pessimistic assumptions have to be made by the controller.
 
 * Modified, the local processor has changed the cache line, implies only one who has it
 * Exclusive, only one processor is using the cache line, not modified
 * Shared, multiple processors are using the cache line, not modified
 * Invalid, the cache line is invalid (unused)
+* Forward, to another socket via QPI
 * Each QPI message takes ~20NS
 
 !SLIDE transition=fade
 # DRAM
-.notes One transistor, one capacitor.  Reading contiguous memory is faster than random access due to how you read - you get one line buffer at a time from each of the memory banks, 33% slower.  240 cycles to get data from here.
+.notes One transistor, one capacitor.  Reading contiguous memory is faster than random access due to how you read - you get one write combining buffer at a time from each of the memory banks, 33% slower.  240 cycles to get data from here.  (Martin: DRAM uses Row Buffers as you address a row of memory in a bank.)
 
 * Very dense, only 2 pieces of circuitry per datum
 * Refresh is just another read operation where the result is discarded & blocks access
 * DRAM "leaks" its charge, but not sooner than 64 milliseconds
-* Every read causes depletes the charge, requires a subsequent recharge
+* Every read depletes the charge, requires a subsequent recharge
 * Memory Controllers can "refresh" DRAM by sending a charge through the entire device
 * Takes NS to retrieve from here
 
@@ -161,10 +166,11 @@ In an inclusive cache (Intel), eviction is much faster, but requires a larger L2
 
 !SLIDE transition=fade
 # Striding & Pre-fetching
-.notes Doesn't have to be contiguous in an array, you can be jumping in 2K chunks without a performance hit.  As long as it's predictable, it will fetch the memory before you need it and have it staged.  Pre-fetching happens with L1d, can happen for L2 for systems with long pipelines.  Hardware prefetching cannot cross page boundaries, which slows it down as the working set size increases. If it did and the page wasn't there or valid, th OS would have to get involved and th program would experience a page fault it didn't initiate itself. 
+.notes Doesn't have to be contiguous in an array, you can be jumping in 2K chunks without a performance hit.  As long as it's predictable, it will fetch the memory before you need it and have it staged.  Pre-fetching happens with L1d, can happen for L2 for systems with long pipelines.  Hardware prefetching cannot cross page boundaries, which slows it down as the working set size increases. If it did and the page wasn't there or valid, th OS would have to get involved and th program would experience a page fault it didn't initiate itself.  (Martin: Pre-fetching can actually hurt if your code is not predictable in access pattern.  Lines that may have temporal benefit get evicted by the pre-fetcher fetching line not to be used.)
 
 * Predictable memory access is really important
 * Hardware prefetcher on the core looks for patterns of memory access
+* Can be counter-productive, believe it or not
 
 !SLIDE transition=fade
 # Cache Misses
@@ -175,8 +181,7 @@ In an inclusive cache (Intel), eviction is much faster, but requires a larger L2
 
 !SLIDE transition=fade
 # Hyperthreading
-.notes 4 CPUs share a memory controller, not more.  Requires new mobo architecture.
-Hyper threading shares all CPU resources except the register set.  Intel CPUs limit to two threads per core, allows one hyper thread to access resources (like the arithmetic logic unit) while another hyper thread is delayed, usually by memory access.  Only more efficient if the combined runtime is lower than a single thread, possible by overlapping wait times for different memory access that would ordinarily be sequential.  The only variable is the number of cache hits.  Note that the effectively shared L1d (& L2) reduce the available caches and bandwidth for each thread to 50% when executing two completely different code (questionable unless the caches are very large), inducing more cache misses, therefore hyper threading is only useful in a limited set of situations.  Can be good for debugging with SMT.
+.notes Hyper threading shares all CPU resources except the register set.  Intel CPUs limit to two threads per core, allows one hyper thread to access resources (like the arithmetic logic unit) while another hyper thread is delayed, usually by memory access.  Only more efficient if the combined runtime is lower than a single thread, possible by overlapping wait times for different memory access that would ordinarily be sequential.  The only variable is the number of cache hits.  Note that the effectively shared L1d (& L2) reduce the available caches and bandwidth for each thread to 50% when executing two completely different code (questionable unless the caches are very large), inducing more cache misses, therefore hyper threading is only useful in a limited set of situations.  Can be good for debugging with SMT.
 
 * Great for I/O-bound applications
 * If you have lots of cache misses
@@ -185,7 +190,7 @@ Hyper threading shares all CPU resources except the register set.  Intel CPUs li
 
 !SLIDE transition=fade
 # Programming Optimizations
-.notes Short lived data is not. Variables scoped within a method are stack allocated and very fast.  Think about the affect of contending locking.  You've got a warmed cache with all of the data you need, and because of contention (arbitrated at the kernel level), the thread will be put to sleep and your cached data is sitting until you can gain the lock from the arbitrator.  Due to LRU, it could be evicted.  The kernel is general purpose, may decide to do some housekeeping like defragging some memory, futher polluting your cache.  When your thread finally does gain the lock, it may end up running on an entirely different core and will have to rewarm its cache.  Everything you do will be a cache miss until its warm again.  CAS is better, an optimistic locking strategy.  Most version control systems use this.  Check the value before you replace it with a new value.  If it's different, re-read and try again.  Happens in user space, not at the kernel, all on thread.  Algos get a lot harder, though - state machines with many more steps and complexity.  And there is still a non-negligible cost.  Remember the cycle time diffs for different cache sizes; if the workload can be tailored to the size of the last level cache, performance can be dramatically improved
+.notes Short lived data is not. Variables scoped within a method are stack allocated and very fast.  Think about the affect of contending locking.  You've got a warmed cache with all of the data you need, and because of contention (arbitrated at the kernel level), the thread will be put to sleep and your cached data is sitting until you can gain the lock from the arbitrator.  Due to LRU, it could be evicted.  The kernel is general purpose, may decide to do some housekeeping like defragging some memory, futher polluting your cache.  When your thread finally does gain the lock, it may end up running on an entirely different core and will have to rewarm its cache.  Everything you do will be a cache miss until its warm again.  CAS is better, an optimistic locking strategy.  Most version control systems use this.  Check the value before you replace it with a new value.  If it's different, re-read and try again.  Happens in user space, not at the kernel, all on thread.  Algos get a lot harder, though - state machines with many more steps and complexity.  And there is still a non-negligible cost.  Remember the cycle time diffs for different cache sizes; if the workload can be tailored to the size of the last level cache, performance can be dramatically improved.  (Martin: Program optimisation: For large n I would consider "cache oblivious algorithms".)
 
 * Stack allocated data is cheap
 * Pointer interaction - you have to retrieve data being pointed to, even in registers
@@ -212,7 +217,7 @@ Hyper threading shares all CPU resources except the register set.  Intel CPUs li
 
 !SLIDE transition=fade
 # Application Memory Wall & GC
-.notes We can have as much RAM/heap space as we want now.  And requirements for RAM grow at about 100x per decade.  But are we now bound by GC?  You can get 100GB of heap, but how long do you pause for marking/remarking phases and compaction?  Even on a 2-4 GB heap, you're going to get multi-second pauses - when and how often?  IBM Metronome collector is very fast (microseconds) if you don't produce more than a certain amount of garbage.  Azul around one millisecond for phenomenal amounts of garbage.
+.notes We can have as much RAM/heap space as we want now.  And requirements for RAM grow at about 100x per decade.  But are we now bound by GC?  You can get 100GB of heap, but how long do you pause for marking/remarking phases and compaction?  Even on a 2-4 GB heap, you're going to get multi-second pauses - when and how often?  IBM Metronome collector is very predictable. Azul around one millisecond for phenomenal amounts of garbage.
 
 * Tremendous amounts of RAM at low cost
 * But is GC the real cause?
@@ -244,13 +249,15 @@ Hyper threading shares all CPU resources except the register set.  Intel CPUs li
 http://en.wikipedia.org/wiki/Memristor
 
 !SLIDE transition=fade
-# !SLIDE transition=fade
 # Credits
 
 * Sources
-	* What Every Programmer Should Know About Memory
+	* [What Every Programmer Should Know About Memory](http://people.freebsd.org/~lstewart/articles/cpumemory.pdf)
 		* Ulrich Drepper of RedHat, 2007
-	* Java Performance
-	* Wikipedia/Wikimedia Commons
-	* Martin Thompson's Mechanical Sympathy blog and Disruptor presentations
-	* Gil Tene, CTO of Azul Systems (http://www.azulsystems.com/presentations/application-memory-wall)
+	* [Java Performance](http://www.amazon.com/Java-Performance-Charlie-Hunt/dp/0137142528/ref=sr_1_1?ie=UTF8&qid=1330796836&sr=8-1)
+	* [Wikipedia/Wikimedia Commons](http://wikipedia.org/)
+	* [Martin Thompson's Mechanical Sympathy blog and Disruptor presentations](http://mechanical-sympathy.blogspot.com/)
+	* [Gil Tene, CTO of Azul Systems](http://www.azulsystems.com/presentations/application-memory-wall)
+
+* Contributors
+	* Martin Thompson provided feedback and additional content
