@@ -63,17 +63,19 @@ NUMA is not the same as multiple commodity machines because they don't have a sh
 * A 64-bit Intel Nehalem CPU has 128 Integer registers, 128 floating point registers
 
 !SLIDE transition=fade
-
-!SLIDE transition=fade
-
-!SLIDE transition=fade
 # Store Buffers
+.notes Store buffers disambiguate memory access and manage dependencies for instructions (loads and stores) occurring out of program order. CPUs typically have load and store buffers which are associative queues of separate load and store instructions that are outstanding to the cache which can be snooped to preserve program order. 
+
+* Load
+* Store
+* ~1 cycle
 
 !SLIDE transition=fade
 # SRAM
 
 * Requires 6-8 pieces of circuitry per datum
 * Runs at a cycle rate, not quite measurable in time
+* Data does not fade or leak, does not need to be refreshed/recharged
 
 !SLIDE transition=fade
 # L1
@@ -120,7 +122,7 @@ In an inclusive cache (Intel), eviction is much faster, but requires a larger L2
 
 !SLIDE transition=fade
 # DRAM
-.notes Reading contiguous memory is faster than random access due to how you read - you get one line buffer at a time from each of the memory banks, 33% slower.  240 cycles to get data from here.
+.notes One transistor, one capacitor.  Reading contiguous memory is faster than random access due to how you read - you get one line buffer at a time from each of the memory banks, 33% slower.  240 cycles to get data from here.
 
 * Very dense, only 2 pieces of circuitry per datum
 * Refresh is just another read operation where the result is discarded & blocks access
