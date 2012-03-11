@@ -19,7 +19,7 @@ object ErrorKernelTest {
 class ErrorKernelTest extends JUnitSuite {
   import ErrorKernelTest._
 
-//  @Test
+  @Test
   def killWorkerShouldRestartMangerAndOtherWorkers = {
     val timingLatch = new StandardLatch
 
@@ -46,7 +46,7 @@ class ErrorKernelTest extends JUnitSuite {
     assert(consumer.isRunning)
   }
 
-  @Test
+//  @Test
   def sendingStopMessageShouldStopAllChildActors = {
     val timingLatch = new StandardLatch
 

@@ -4,7 +4,9 @@
 
 Jamie Allen
 
-Chariot Day 2012
+@jamie_allen
+
+NE Scala 2012
 
 !SLIDE transition=fade
 # How Coding in Scala Makes Me Feel
@@ -41,14 +43,17 @@ Chariot Day 2012
 .notes Everything is an object.
 
 !SLIDE transition=fade
-# Default Parameter Values
+# Case Classes
+.notes DTOs done right, all class parameters are immutable, cannot be extended, equals() and hashCode() with no annoyance
 
-    class Address(val State = "PA")
+	case class Person(firstName: String, lastName: String)
 
 !SLIDE transition=fade
-# Named Parameters
+# Default Parameter Values and Named Parameters
 
-    new Person(lastName = "Doe")
+    case class Person(val fName: String = "Jamie", val lName: String = "Allen")
+    val jamieAllen = new Person // jamieAllen: Person = Person(Jamie,Allen)
+    val jamieDoe = new Person(lName = "Doe") // jamieDoe: Person = Person(Jamie,Doe)
 
 !SLIDE transition=fade
 # By-Name Parameters
@@ -69,27 +74,33 @@ Chariot Day 2012
 # Imports
 .notes Can be anywhere in a class, embedded in code, allow for selecting multiple classes from a package, aliasing
 
-	import scala.collection.mutable.{Map => MMap}
 	import scala.collection.immutable.Map
+
+	class Person(val fName: String, val lName: String) {
+  	  import scala.collection.mutable.{Map => MMap}
+  	  val cars: MMap[String, String] = MMap()
+  	  ...
+	}
 
 !SLIDE transition=fade
 # Objects
+.notes Singletons within a JVM, no private constructor histrionics, Companion Objects, used for factories and constants
 
-* Singletons within a JVM, no private constructor histrionics
-* Companion Objects, used for factories and constants
+	object Person {
+		def createJamieAllen = new Person("Jamie", "Allen")
+		def createJamieDoe = new Person("Jamie", "Doe")
 
-!SLIDE transition=fade
-# Case Classes
-.notes DTOs done right, all class parameters are immutable, cannot be extended, equals() and hashCode() with no annoyance
+		val aConstantValue = "A constant value"
+	}
 
-	case class Person(firstName: String, lastName: String)
+    class Person(val fName: String, val lName: String)
 
 !SLIDE transition=fade
 # Tuples
 .notes Binds you to an implementation, very fragile.  But useful.  Great way to group values without a DTO.  How to return multiple values, but wrapped in a single object instance.
 
 	case class Person(name: String)
-	val (num: Int, person: Person) = (1, Person("Phil"))
+	val (num: Int, person: Person) = (1, Person(fName = "Phil"))
 
 !SLIDE transition=fade
 # Pattern Matching
@@ -211,7 +222,7 @@ Chariot Day 2012
 !SLIDE transition=fade
 # fold
 
-    val sum = numbers.foldLeft(0){ case (acc, currentVal) => acc + currentVal }
+    val sum = numbers.foldLeft(0)((acc, currentVal) => acc + currentVal)
 
     sum: Ints = 210
 
@@ -232,8 +243,8 @@ Chariot Day 2012
 # Function Types
 .notes lambdas & closures defined without binding to a definition
 
-* Function literals
-* Function types	
+    (x: Int) => x + 1 // Function literal
+	val doubler: Int => Int = _ * 2 // Function types	
 
 !SLIDE transition=fade
 # Type Theory
@@ -257,7 +268,7 @@ Chariot Day 2012
     Foo#Bar 
 
     // Structural types
-	def loadProperties(c:{ def getProperties():Properties })
+	def loadProperties(propertyHolder: { def getProperties():Properties })
 
 !SLIDE transition=fade
 # Type Constraints
@@ -369,6 +380,7 @@ Chariot Day 2012
 !SLIDE transition=fade
 # Flatmapping Across Data Collections Example
 
+	  // Return a MultiMap of all source IDs for an Account number and MAC address
 	  val macsByAccountNumber = getMapFromFile("Accounts-MAC.csv"), 0, 3)
 	  val rateCodesByMac = getMapFromFile("MAC-RCs.csv", 0, 1)
 	  val bsgHandlesByRateCode = getMapFromFile("RC-BSG.csv", 5, 6)
@@ -376,11 +388,11 @@ Chariot Day 2012
 
 	  val sourceIdsByAcctAndMac = new MMap[(String, String), MSet[String]]() with MultiMap[(String, String), String]
 	  for {
-	    acc <- macsByAccountNumber.keys
-	  	mac <- macsByAccountNumber.getOrElse(acc, MSet().empty)
-	  	rc <- rateCodesByMac.get(mac).flatten
-	  	bsg <- bsgHandlesByRateCode.get(rc).flatten
-	  	src <- sourceIdByBsgHandle.get(bsg).flatten
+	    acc <- macsByAccountNumber.keys // for each account
+	  	mac <- macsByAccountNumber.getOrElse(acc, MSet().empty) // for each device, which may be empty
+	  	rc <- rateCodesByMac.get(mac).flatten // for each rate code associated with a device, flattened by device
+	  	bsg <- bsgHandlesByRateCode.get(rc).flatten // for each BSG, flattened by rate code
+	  	src <- sourceIdByBsgHandle.get(bsg).flatten // for each source ID, flattened by BSG
       } yield sourceIdsByAcctAndMac.addBinding((acc, mac), src)
 	}
 
