@@ -1,6 +1,6 @@
 !SLIDE title-page
 
-## Scala - The Kitchen Sink in 45 Minutes
+## A Taxonomy of Scala
 
 Jamie Allen
 
